@@ -1,40 +1,67 @@
-export async function GET(request) {
-    try {
-        // Prepare the body data and headers
-        const bodyData = {
-            "addressLine1": "2337 Rolling Oak Dr",
-            "addressLine2": "Indianapolis, IN"
-        };
+// app/api/inherit/route.js
 
-        const headers = {
-            'Content-Type': 'application/json',
-            'galaxy-ap-name': process.env.Key,
-            'galaxy-ap-password': process.env.Secret,
-            'galaxy-search-type': 'DevAPIAddressID'
-        };
+export async function POST(request) {
+    const body = await request.json();
+    const { street, city, unit } = body;
+    console.log(street);
 
-        // Make the external API request
-        const res = await fetch('https://api.peoplefinderspro.com/address/id', {
-            method: 'POST', // changed to POST since you're sending data
-            headers: headers,
-            body: JSON.stringify(bodyData), // the body should be a string
-        });
+    // Prepare the body data and headers for the external API
+    const bodyData = {
+        "addressLine1": street,
+        "addressLine2": `${city}, ${unit}`
+    };
 
-        // Check if the response is okay (status is within the range of 200-299)
-        if (!res.ok) {
-            throw new Error(`Server responded with a status of ${res.status}`);
-        }
+    const headers = {
+        'Content-Type': 'application/json',
+        'galaxy-ap-name': process.env.Key,
+        'galaxy-ap-password': process.env.Secret,
+        'galaxy-search-type': 'DevAPIAddressID'
+    };
 
-        // Get the JSON from the response
-        const data = await res.json();
-
-        // Respond with the data (assumes Response is from the fetch Web API or similar)
-        return Response.json(data); // this constructs a response to send back to the client
-    } catch (error) {
-        // Handle any errors
-        console.error("An error occurred:", error);
-
-        // Respond with a 500 status code in case of error
-        return new Response(null, { status: 500 });
+    // Uncomment when you're ready to make the external API request
+    /*
+    const res = await fetch('https://api.peoplefinderspro.com/address/id', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(bodyData),
+    });
+    
+    if (!res.ok) {
+        throw new Error(`External API responded with a status of ${res.status}`);
     }
+
+    const data = await res.json();
+    */
+
+    // Mocked data
+    const data = {
+        "persons": [
+            {
+                "name": {
+                    "firstName": "Shawna",
+                    "middleName": "D",
+                    "lastName": "Thomas"
+                },
+                "age": "59",
+                "addresses": [],
+                "phones": ["3174180311"],
+                "emails": []
+            },
+            {
+                "name": {
+                    "firstName": "Isaiah",
+                    "middleName": "",
+                    "lastName": "Thomas"
+                },
+                "age": "23",
+                "addresses": [],
+                "phones": ["3179299299"],
+                "emails": []
+            }
+        ],
+        // ... rest of the data
+    };
+
+    // Return the data to the client
+    return new Response(JSON.stringify(data), { status: 200 });
 }
